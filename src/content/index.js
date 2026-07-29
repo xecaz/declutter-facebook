@@ -71,7 +71,7 @@ globalThis.FBF = globalThis.FBF || {};
   }
 
   function watchStorage() {
-    chrome.storage.onChanged.addListener(
+    FBF.api.storage.onChanged.addListener(
       guard((changes, areaName) => {
         if (areaName !== 'local') return;
 
@@ -179,7 +179,7 @@ globalThis.FBF = globalThis.FBF || {};
   }
 
   function watchMessages() {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    FBF.api.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Wrapped whole. Whatever happens in here, something must go back, or
       // the popup can only conclude that nothing is listening.
       try {

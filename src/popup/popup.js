@@ -8,7 +8,8 @@
 (function () {
   'use strict';
 
-  const storage = globalThis.FBF.storage;
+  const FBF = globalThis.FBF;
+  const storage = FBF.storage;
 
   /**
    * These count *posts in the home feed*, not people in the index. The two
@@ -58,7 +59,7 @@
   /**
    * Ask the active tab what it is doing.
    *
-   * chrome.tabs.query works without the "tabs" permission — it just withholds
+   * FBF.api.tabs.query works without the "tabs" permission — it just withholds
    * the URL, and we only need the id. The content script reports its own
    * location, so no extra permission is needed to know where we are.
    *
@@ -71,8 +72,8 @@
   async function tabStatus() {
     let tab;
     try {
-      [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (!tab) [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+      [tab] = await FBF.api.tabs.query({ active: true, currentWindow: true });
+      if (!tab) [tab] = await FBF.api.tabs.query({ active: true, lastFocusedWindow: true });
     } catch (error) {
       return { state: 'unreachable', why: String((error && error.message) || error) };
     }
@@ -85,7 +86,7 @@
     let why = null;
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        const reply = await chrome.tabs.sendMessage(tab.id, { type: 'fbf:status' });
+        const reply = await FBF.api.tabs.sendMessage(tab.id, { type: 'fbf:status' });
         if (reply) return { state: 'ok', tabId: tab.id, ...reply };
         why = 'The tab replied with nothing.';
       } catch (error) {
@@ -341,7 +342,7 @@
       button.disabled = true;
       button.textContent = 'Capturing…';
       try {
-        const result = await chrome.tabs.sendMessage(status.tabId, {
+        const result = await FBF.api.tabs.sendMessage(status.tabId, {
           type: 'fbf:capture',
           kind,
         });

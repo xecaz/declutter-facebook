@@ -1,5 +1,5 @@
 /**
- * chrome.storage.local access, shared by the content script, popup and worker.
+ * Extension storage, shared by the content script, popup and worker.
  *
  * Everything lives on this machine. There is no server, no sync, no telemetry.
  * Post text is never written here — only author keys, classifications, counts,
@@ -58,14 +58,22 @@ globalThis.FBF = globalThis.FBF || {};
   const EMPTY_DAY = {};
   for (const t of [...POST_TYPES, ...META_TYPES]) EMPTY_DAY[t] = 0;
 
-  const area = chrome.storage.local;
+  /**
+   * Resolved on use, not at load. The test page loads this file outside any
+   * extension context, where there is no storage at all; failing here rather
+   * than at import keeps that page working.
+   */
+  function area() {
+    if (!FBF.hasExtensionApis) throw new Error('extension storage is not available here');
+    return FBF.api.storage.local;
+  }
 
   function get(keys) {
-    return area.get(keys);
+    return area().get(keys);
   }
 
   function set(obj) {
-    return area.set(obj);
+    return area().set(obj);
   }
 
   /** Local calendar date, so buckets line up with the user's own days. */
@@ -117,7 +125,7 @@ globalThis.FBF = globalThis.FBF || {};
   }
 
   async function clearIndex() {
-    await area.remove([KEY.friends, KEY.groups]);
+    await area().remove([KEY.friends, KEY.groups]);
   }
 
   // ---------------------------------------------------------------------------
@@ -238,7 +246,7 @@ globalThis.FBF = globalThis.FBF || {};
   }
 
   async function clearStats() {
-    await area.remove(KEY.stats);
+    await area().remove(KEY.stats);
     buffer = { ...EMPTY_DAY };
     bufferDirty = false;
   }
@@ -319,7 +327,7 @@ globalThis.FBF = globalThis.FBF || {};
   }
 
   async function clearHidden() {
-    await area.remove(KEY.hidden);
+    await area().remove(KEY.hidden);
   }
 
   // ---------------------------------------------------------------------------

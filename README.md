@@ -1,6 +1,7 @@
 # Feed Filter
 
-A Chrome extension that gives you back the Facebook feed you actually chose:
+A browser extension for Chrome and Firefox that gives you back the Facebook
+feed you actually chose:
 posts from friends you added and groups you joined. Everything else can be
 counted, greyed out, hidden, or permanently opted out of — your choice, one
 setting at a time.
@@ -29,12 +30,83 @@ running — it is how you tell whether the classifier is working.
 
 ## Install
 
+Runs on both Chrome and Firefox from the same folder — no build step, no
+separate branch.
+
+### Chrome
+
 1. Open `chrome://extensions`
 2. Turn on **Developer mode** (top right)
 3. **Load unpacked** → select this folder
 
 Chrome will not let an extension pin its own icon. To keep it visible, click
 the puzzle-piece button in the toolbar and pin **Feed Filter**.
+
+### Firefox
+
+1. Open `about:debugging#/runtime/this-firefox`
+2. **Load Temporary Add-on…** → select `manifest.json` in this folder
+3. Click the extension's toolbar button and choose **Always Allow on
+   facebook.com**
+
+That third step is not optional and has no Chrome equivalent. **Firefox treats
+Manifest V3 host permissions as opt-in**: the extension is installed but can
+see nothing until you grant it the site, and until you do it will simply report
+"No reply from this tab" on every Facebook page.
+
+Temporary add-ons are removed when Firefox restarts. To keep it installed you
+either need it signed through addons.mozilla.org, or a Firefox ESR / Developer
+Edition build with `xpinstall.signatures.required` set to `false`, into which
+you can drop a zipped `.xpi`.
+
+### Packaged build
+
+`dist/feed-filter-<version>.zip` is the same tree, zipped. One archive serves
+both browsers:
+
+- **Chrome** — unzip it and *Load unpacked*, or drag the `.zip` onto
+  `chrome://extensions`
+- **Firefox** — rename it to `.xpi`. It installs directly on a build that
+  allows unsigned add-ons (ESR or Developer Edition with
+  `xpinstall.signatures.required` set to `false`); otherwise it needs signing
+  through addons.mozilla.org first.
+
+Rebuild it after changing the version in `manifest.json`:
+
+```sh
+python3 - <<'EOF'
+import zipfile, pathlib, json
+root = pathlib.Path('.')
+version = json.loads((root/'manifest.json').read_text())['version']
+skip_dirs, skip_files = {'.git', 'dist'}, {'.gitignore'}
+files = sorted(f for f in root.rglob('*') if f.is_file()
+               and not skip_dirs & set(f.parts) and f.name not in skip_files
+               and f.suffix not in {'.zip', '.xpi'})
+with zipfile.ZipFile(root/'dist'/f'feed-filter-{version}.zip', 'w',
+                     zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+    for f in files:
+        # Fixed timestamps: same source in, byte-identical archive out, so a
+        # rebuild does not show up as a change in git for no reason.
+        i = zipfile.ZipInfo(str(f.relative_to(root)), date_time=(2026, 7, 29, 0, 0, 0))
+        i.compress_type, i.external_attr = zipfile.ZIP_DEFLATED, 0o644 << 16
+        z.writestr(i, f.read_bytes())
+EOF
+```
+
+### How the one folder serves both
+
+Three things differ, and all three are handled in the source rather than by
+maintaining two copies:
+
+- **The API namespace.** Firefox provides the promise-based `browser`; Chrome
+  provides `chrome`, which also returns promises under MV3. `src/lib/browser-api.js`
+  resolves whichever exists once, so every call site can just `await`.
+- **The background script.** Chrome runs a service worker; Firefox MV3 uses an
+  event page. The manifest declares `background.service_worker` *and*
+  `background.scripts` — each browser reads its own key and ignores the other.
+- **Loading dependencies.** `importScripts` exists in a service worker but not
+  on a Firefox event page, so `worker.js` guards the call and Firefox lists the
+  same files in `background.scripts` instead.
 
 > **Reload your Facebook tabs after loading or reloading the extension.**
 > Chrome only injects content scripts into pages opened *after* the extension
@@ -229,7 +301,8 @@ interaction is against Facebook's terms, and account actions are possible.
    opening pages you did not open. Reading DOM that Facebook already rendered
    for a page you visited is ordinary client-side behaviour.
 2. **No network requests.** No `fetch`, no `XMLHttpRequest`, no GraphQL. The
-   only permissions are `storage` and `https://*.facebook.com/*`.
+   only permissions are `storage` and `https://*.facebook.com/*` — and on
+   Firefox the latter is opt-in, granted by you per site.
 3. **Nothing leaves this machine.** Everything is `chrome.storage.local`. No
    server, no sync, no telemetry. Your index is a list of your friends — treat
    it as sensitive.
@@ -332,6 +405,7 @@ manifest.json
 icons/
 src/
   lib/
+    browser-api.js   Resolves Firefox's `browser` or Chrome's `chrome`, once
     keys.js          URL -> stable profile/group/story key (strips FB tracking params)
     selectors.js     The ONLY file that knows Facebook's DOM
     storage.js       chrome.storage.local: index, counts, hidden log, settings
@@ -345,7 +419,7 @@ src/
     sweeper.js       The automatic sweep, and its safeguards
     debug-overlay.js Opt-in classification outlines
   background/
-    worker.js        Toolbar badge, nothing else
+    worker.js        Toolbar badge, nothing else (service worker / event page)
   popup/             The entire user interface
 test/
   index.html         Open this in Chrome to run the tests
@@ -387,6 +461,10 @@ Two ways in:
 
 The runner is a small local script using plain script tags and DOM APIs. No
 runtime, no eval, no network.
+
+The suite passes in **both Chrome and Firefox** — worth running in each, since
+they are different JavaScript engines and a syntax or behaviour difference
+would show up nowhere else.
 
 Coverage is the logic where a silent mistake would look like correct behaviour:
 key normalization, the classification priority order, what may and may not be

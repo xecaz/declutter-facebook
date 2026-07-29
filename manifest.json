@@ -10,7 +10,12 @@
     "https://*.facebook.com/*"
   ],
   "background": {
-    "service_worker": "src/background/worker.js"
+    "service_worker": "src/background/worker.js",
+    "scripts": [
+      "src/lib/browser-api.js",
+      "src/lib/storage.js",
+      "src/background/worker.js"
+    ]
   },
   "action": {
     "default_popup": "src/popup/popup.html",
@@ -34,6 +39,7 @@
         "https://*.facebook.com/*"
       ],
       "js": [
+        "src/lib/browser-api.js",
         "src/lib/keys.js",
         "src/lib/selectors.js",
         "src/lib/storage.js",
@@ -48,5 +54,11 @@
       ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "feed-filter@xecaz.local",
+      "strict_min_version": "128.0"
+    }
+  }
 }
