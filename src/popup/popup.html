@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Feed Filter</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="head">
+      <h1>Feed Filter</h1>
+      <div class="range" role="group" aria-label="Time range">
+        <button type="button" data-range="today" class="on">Today</button>
+        <button type="button" data-range="7d">7 days</button>
+      </div>
+    </header>
+
+    <section class="status" id="status" aria-live="polite"></section>
+
+    <section class="headline" aria-live="polite">
+      <div class="pct" id="pct">—</div>
+      <p class="caption">
+        of your home feed came from <strong>friends or groups you joined</strong>
+      </p>
+      <p class="sub" id="sub">No posts counted yet.</p>
+    </section>
+
+    <section class="section">
+      <h2>Home feed posts</h2>
+      <div class="bar" id="bar" role="img" aria-label="Feed composition"></div>
+      <ul class="legend" id="legend"></ul>
+      <p class="hint" id="bar-hint"></p>
+    </section>
+
+    <section class="section">
+      <h2>Your index</h2>
+      <div class="rows" id="index-rows"></div>
+      <p class="hint" id="index-hint"></p>
+    </section>
+
+    <section class="section" id="hidden-section" hidden>
+      <h2>Opted out of</h2>
+      <div class="rows" id="hidden-rows"></div>
+      <ul class="hidden-list" id="hidden-list"></ul>
+      <p class="hint" id="hidden-hint"></p>
+    </section>
+
+    <section class="section" id="health-section">
+      <h2>Health</h2>
+      <div class="rows" id="health-rows"></div>
+      <p class="hint" id="health-hint"></p>
+    </section>
+
+    <section class="section controls">
+      <h2>Posts you did not choose</h2>
+      <div class="modes" role="group" aria-label="What to do with unchosen posts">
+        <button type="button" data-mode="off">Leave them</button>
+        <button type="button" data-mode="dim">Dim</button>
+        <button type="button" data-mode="hide">Hide</button>
+      </div>
+      <p class="hint" id="mode-hint"></p>
+
+      <label class="toggle danger-toggle">
+        <input type="checkbox" id="auto-hide" />
+        <span>
+          <strong>Automatically hide every unchosen source.</strong>
+          Tells Facebook “Hide all from…” for each new page, group or person your
+          feed shows you, without asking. This is permanent, applies to your phone
+          too, and Facebook offers no list of it — the log above is the only record.
+        </span>
+      </label>
+      <p class="hint" id="sweep-hint"></p>
+
+      <label class="toggle">
+        <input type="checkbox" id="hide-unreadable" />
+        <span>
+          Also act on posts I could not read at all.
+          These are the ones most likely to be a misread friend, so this is off by default.
+        </span>
+      </label>
+
+      <label class="toggle">
+        <input type="checkbox" id="never-show-shortcut" />
+        <span>
+          Add a <strong>“Never show from this”</strong> button to unchosen posts.
+          One click tells Facebook to hide everything from that source. Each use is logged above.
+        </span>
+      </label>
+
+      <label class="toggle">
+        <input type="checkbox" id="debug-overlay" />
+        <span>Outline posts on the page by classification</span>
+      </label>
+      <div class="buttons">
+        <button type="button" id="clear-stats" class="ghost">Clear stats</button>
+        <button type="button" id="clear-index" class="ghost danger">Clear index</button>
+      </div>
+    </section>
+
+    <footer class="foot">
+      Counting covers the home feed only. Nothing leaves this machine.
+    </footer>
+
+    <script src="../lib/storage.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

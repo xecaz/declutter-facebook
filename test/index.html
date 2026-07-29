@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Feed Filter — tests</title>
+    <link rel="stylesheet" href="test.css" />
+  </head>
+  <body>
+    <h1>Feed Filter tests</h1>
+    <p class="note">
+      Covers the pure logic — key normalization and the classification priority
+      order — which is where a silent mistake would bias the measurement.
+      DOM-facing code is verified with the debug overlay on a real feed instead.
+    </p>
+
+    <main id="results"></main>
+
+    <!-- Order matters. classify.js captures FBF.selectors when it loads, so
+         the stub has to be in place before it — and the real selectors.js
+         loads afterwards, replacing FBF.selectors for its own tests while
+         classify.js keeps the stub it already holds.
+
+         Everything is a plain script tag — no inline script, no eval — so this
+         page runs from file:// and from inside the extension alike. -->
+    <script src="harness.js"></script>
+    <script src="../src/lib/keys.js"></script>
+    <script src="stub-selectors.js"></script>
+    <script src="../src/content/classify.js"></script>
+    <script src="../src/lib/selectors.js"></script>
+    <script src="../src/content/filter.js"></script>
+    <script src="../src/content/actions.js"></script>
+    <script src="../src/lib/storage.js"></script>
+    <script src="../src/content/sweeper.js"></script>
+    <script src="keys.tests.js"></script>
+    <script src="classify.tests.js"></script>
+    <script src="selectors.tests.js"></script>
+    <script src="sponsored.tests.js"></script>
+    <script src="filter.tests.js"></script>
+    <script src="actions.tests.js"></script>
+    <script src="sweeper.tests.js"></script>
+    <script src="throttle.tests.js"></script>
+    <script src="run.js"></script>
+  </body>
+</html>

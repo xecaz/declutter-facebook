@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Feed Filter",
+  "version": "0.4.0",
+  "description": "Shows only what you chose \u2014 friends and groups you joined. Counts the rest, and can dim it, hide it, or stop it at the source.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.facebook.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/worker.js"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Feed Filter \u2014 what your feed is made of",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.facebook.com/*"
+      ],
+      "js": [
+        "src/lib/keys.js",
+        "src/lib/selectors.js",
+        "src/lib/storage.js",
+        "src/content/classify.js",
+        "src/content/debug-overlay.js",
+        "src/content/filter.js",
+        "src/content/actions.js",
+        "src/content/sweeper.js",
+        "src/content/feed-scanner.js",
+        "src/content/index-capture.js",
+        "src/content/index.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

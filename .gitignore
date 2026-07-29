@@ -1,0 +1,14 @@
+# Saved Facebook pages, captured to debug selectors against real markup.
+#
+# These hold your friend list, your feed and its images — a single "Save page
+# as" run left 28 MB of it in this folder. Ignored at the root so a stray
+# capture can never be committed by accident; the anonymised fixtures in
+# test/ are what the findings live on as.
+/*.html
+/*_files/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+*.swp
+*~
