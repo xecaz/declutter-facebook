@@ -61,8 +61,9 @@ you can drop a zipped `.xpi`.
 
 ### Packaged build
 
-`dist/feed-filter-<version>.zip` is the same tree, zipped. One archive serves
-both browsers:
+`dist/feed-filter-<version>.zip` is the extension itself, zipped — the source,
+icons and tests, without `docs/`, which is repository documentation and store
+copy rather than anything the extension runs. One archive serves both browsers:
 
 - **Chrome** — unzip it and *Load unpacked*, or drag the `.zip` onto
   `chrome://extensions`
@@ -78,7 +79,7 @@ python3 - <<'EOF'
 import zipfile, pathlib, json
 root = pathlib.Path('.')
 version = json.loads((root/'manifest.json').read_text())['version']
-skip_dirs, skip_files = {'.git', 'dist'}, {'.gitignore'}
+skip_dirs, skip_files = {'.git', 'dist', 'docs'}, {'.gitignore'}
 files = sorted(f for f in root.rglob('*') if f.is_file()
                and not skip_dirs & set(f.parts) and f.name not in skip_files
                and f.suffix not in {'.zip', '.xpi'})
