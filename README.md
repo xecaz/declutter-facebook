@@ -238,6 +238,36 @@ The cost is that an unchosen source showing no button at all survives. That is
 the right way round: the failure becomes a post you did not want and can
 dismiss, rather than a post you did want and never learn existed.
 
+### Languages
+
+The allowlist itself is language-independent — it compares identifiers, not
+words. The signals layered on top of it are not, so the labels Facebook renders
+are matched across the languages its interface ships in: Follow and Join in
+around twenty European languages, and the sponsored and suggested markers in a
+dozen. **You do not need to switch Facebook to English.**
+
+Two details make that maintainable rather than a list to keep fighting with:
+
+- **Labels are folded before comparison** — lowercased, accents stripped — so
+  one entry covers a word however it is written, and an inconsistent diacritic
+  in Facebook's markup cannot cause a miss. `Följ`, `Sledovať` and `Alătură-te`
+  need no special handling.
+- **Letters that are not accented bases are mapped by hand.** Stripping
+  combining marks does nothing for Danish `ø`, Polish `ł`, Turkish dotless `ı`
+  or German `ß`, because those are their own characters rather than decorated
+  ones. Forgetting them is exactly how `Følg` and `Dołącz` went unrecognised
+  until the tests caught it.
+
+Follow and Join labels are matched **whole**, never as substrings, which is what
+stops a post that merely contains the word "follow" from being read as carrying
+a Follow button. The sponsored and suggested markers are matched on stems, but
+only ever against short standalone labels and accessible names — never against
+post text.
+
+Adding a language means adding a string to `FOLLOW_LABELS` or `JOIN_LABELS` in
+`src/lib/selectors.js`. `test/sponsored.tests.js` covers each one, and a wrong
+guess fails there rather than in your feed.
+
 ---
 
 ## Acting on Facebook
@@ -271,7 +301,7 @@ So the safeguards target what actually matters:
   attempts would click the wrong item.
 - **Paced** — several seconds apart with jitter, and only while the tab is
   visible.
-- **Capped at 150 a day** (`DAILY_CAP` in `sweeper.js`), so a bug cannot run
+- **Capped per day** (`DAILY_CAP` in `sweeper.js`), so a bug cannot run
   away with the account.
 - **Stops itself** after five consecutive failures to find the menu item,
   rather than clicking blindly into changed markup.

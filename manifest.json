@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Feed Filter",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Shows only what you chose \u2014 friends and groups you joined. Counts the rest, and can dim it, hide it, or stop it at the source.",
   "permissions": [
     "storage"

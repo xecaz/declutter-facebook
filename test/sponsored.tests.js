@@ -124,28 +124,82 @@
     );
   });
 
-  test('Follow is recognised in other languages', () => {
-    for (const label of ['Volgen', 'Folgen', 'Suivre', 'Seguir', 'Följ']) {
+  test('Follow is recognised across European languages', () => {
+    const labels = [
+      ['English', 'Follow'], ['Dutch', 'Volgen'], ['German', 'Folgen'],
+      ['French', 'Suivre'], ['Spanish', 'Seguir'], ['Italian', 'Segui'],
+      ['Swedish', 'F\u00f6lj'], ['Danish', 'F\u00f8lg'], ['Finnish', 'Seuraa'],
+      ['Polish', 'Obserwuj'], ['Czech', 'Sledovat'], ['Slovak', 'Sledova\u0165'],
+      ['Hungarian', 'K\u00f6vet\u00e9s'], ['Romanian', 'Urm\u0103re\u0219te'],
+      ['Croatian', 'Prati'], ['Slovenian', 'Sledi'], ['Estonian', 'J\u00e4lgi'],
+      ['Latvian', 'Sekot'], ['Lithuanian', 'Sekti'], ['Turkish', 'Takip et'],
+      ['Catalan', 'Segueix'],
+      ['Greek', '\u0391\u03ba\u03bf\u03bb\u03bf\u03cd\u03b8\u03b7\u03c3\u03b7'],
+    ];
+    for (const [language, label] of labels) {
       withFixture(`<div class="post"><div role="button">${label}</div></div>`, (host) => {
         assert.equal(
           S.detectMarkers(host.firstElementChild).followButton,
           true,
-          `${label} should count as a follow button`,
+          `${language}: "${label}" should be a follow button`,
         );
       });
     }
   });
 
-  test('Join is recognised, and is kept separate from Follow', () => {
+  test('accents are not required to match', () => {
+    // Facebook is not always consistent about diacritics. Matching folds them
+    // away rather than listing every spelling and hoping each one is right.
+    for (const label of ['Folj', 'Folg', 'Sledovat', 'Kovetes', 'Urmareste', 'Jalgi']) {
+      withFixture(`<div class="post"><div role="button">${label}</div></div>`, (host) => {
+        assert.equal(
+          S.detectMarkers(host.firstElementChild).followButton,
+          true,
+          `unaccented "${label}" should still match`,
+        );
+      });
+    }
+  });
+
+  test('Join is recognised across European languages, separately from Follow', () => {
     // They prove different things. Follow says you do not follow this page;
-    // only Join says you are not a member of this group. A group you belong to
-    // can still offer to follow its posts, so merging the two made such a
-    // group look unchosen whenever the index had not got it.
-    for (const label of ['Join', 'Lid worden', 'Beitreten', 'Rejoindre']) {
+    // only Join says you are not a member of this group, because a group you
+    // belong to can still offer to follow its posts.
+    const labels = [
+      ['English', 'Join'], ['Dutch', 'Lid worden'], ['German', 'Beitreten'],
+      ['French', 'Rejoindre'], ['Spanish', 'Unirte'], ['Portuguese', 'Participar'],
+      ['Italian', 'Iscriviti'], ['Swedish', 'G\u00e5 med'], ['Norwegian', 'Bli med'],
+      ['Finnish', 'Liity'], ['Polish', 'Do\u0142\u0105cz'],
+      ['Czech', 'P\u0159ipojit se'], ['Hungarian', 'Csatlakoz\u00e1s'],
+      ['Romanian', 'Al\u0103tur\u0103-te'], ['Croatian', 'Pridru\u017ei se'],
+      ['Estonian', 'Liitu'], ['Latvian', 'Pievienoties'],
+      ['Lithuanian', 'Prisijungti'], ['Turkish', 'Kat\u0131l'],
+      ['Catalan', 'Uneix-te'],
+    ];
+    for (const [language, label] of labels) {
       withFixture(`<div class="post"><div role="button">${label}</div></div>`, (host) => {
         const markers = S.detectMarkers(host.firstElementChild);
-        assert.equal(markers.joinButton, true, `${label} should be a join button`);
-        assert.equal(markers.followButton, false, `${label} is not a follow button`);
+        assert.equal(markers.joinButton, true, `${language}: "${label}" should be a join button`);
+        assert.equal(markers.followButton, false, `${language}: "${label}" is not a follow button`);
+      });
+    }
+  });
+
+  test('the wordier join labels are still matched', () => {
+    for (const label of ['Rejoindre le groupe', 'Gruppe beitreten', 'Unirte al grupo']) {
+      withFixture(`<div class="post"><div role="button">${label}</div></div>`, (host) => {
+        assert.equal(S.detectMarkers(host.firstElementChild).joinButton, true, label);
+      });
+    }
+  });
+
+  test('the sponsored label is recognised in other languages', () => {
+    for (const label of [
+      'Gesponsord', 'Gesponsert', 'Sponsoris\u00e9', 'Patrocinado',
+      'Sponsorizzato', 'Sponsrad', 'Sponsoreret', 'Reklama', 'Mainos',
+    ]) {
+      withFixture(`<div class="post"><span>${label}</span></div>`, (host) => {
+        assert.equal(S.detectMarkers(host.firstElementChild).sponsored, true, label);
       });
     }
   });

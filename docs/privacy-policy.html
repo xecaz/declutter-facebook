@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy — Feed Filter</title>
+    <meta
+      name="description"
+      content="Privacy policy for the Feed Filter browser extension. No data is collected, transmitted or shared."
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #1c1e21;
+        --muted: #5c6066;
+        --line: #e2e5e9;
+        --panel: #f6f7f9;
+        --accent: #1f7a45;
+        --warn: #a3521a;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #17181a;
+          --fg: #e6e8ea;
+          --muted: #a2a7ad;
+          --line: #303337;
+          --panel: #202225;
+          --accent: #52c07d;
+          --warn: #d9924e;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        max-width: 46rem;
+        margin: 0 auto;
+        padding: 3rem 1.25rem 5rem;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      h1 { font-size: 1.7rem; line-height: 1.25; margin: 0 0 .4rem; }
+      h2 {
+        font-size: 1.05rem; margin: 2.4rem 0 .7rem;
+        padding-top: 1.4rem; border-top: 1px solid var(--line);
+      }
+      h2:first-of-type { border-top: 0; padding-top: 0; }
+      h3 { font-size: .95rem; margin: 1.4rem 0 .4rem; }
+      p, li { margin: 0 0 .8rem; }
+      ul { padding-left: 1.3rem; }
+      a { color: inherit; text-underline-offset: 2px; }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: .87em; padding: .1em .35em;
+        background: var(--panel); border-radius: 4px;
+      }
+      .updated { color: var(--muted); font-size: .9rem; margin-bottom: 2.2rem; }
+      .callout {
+        margin: 1.4rem 0; padding: 1rem 1.15rem;
+        background: var(--panel); border-left: 3px solid var(--accent);
+        border-radius: 0 6px 6px 0;
+      }
+      .callout.attention { border-left-color: var(--warn); }
+      .callout p:last-child, li:last-child { margin-bottom: 0; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .93rem; }
+      th, td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { color: var(--muted); font-weight: 600; }
+      .wrap { overflow-x: auto; }
+      footer {
+        margin-top: 3rem; padding-top: 1.4rem;
+        border-top: 1px solid var(--line);
+        color: var(--muted); font-size: .9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Privacy Policy — Feed Filter</h1>
+    <p class="updated">Last updated: 29 July 2026 · Applies to Feed Filter version 0.4.0 and later</p>
+
+    <div class="callout">
+      <p>
+        <strong>Feed Filter collects nothing.</strong> It has no server, makes no network
+        requests of any kind, and contains no analytics, tracking or telemetry. Everything it
+        records stays in your browser's local storage on your own device, and nobody —
+        including the developer — can see it.
+      </p>
+    </div>
+
+    <h2>What the extension does</h2>
+    <p>
+      Feed Filter identifies which posts in your Facebook home feed come from friends you added
+      and groups you joined, and lets you count, dim, hide or opt out of the rest. To do that it
+      reads the content of Facebook pages you have opened yourself, in your browser, as they are
+      displayed.
+    </p>
+
+    <h2>What is stored, and where</h2>
+    <p>
+      All of the following is written to your browser's local extension storage
+      (<code>storage.local</code>). It never leaves your device. It is not synced between your
+      browsers or computers.
+    </p>
+
+    <div class="wrap">
+      <table>
+        <thead>
+          <tr><th>What</th><th>Why</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Your friends list</strong> — profile identifiers and display names, read
+            from your own “All friends” page</td>
+            <td>To recognise which posts are from people you added</td>
+          </tr>
+          <tr>
+            <td><strong>Your groups</strong> — group identifiers and names, read from your own
+            “Your groups” page</td>
+            <td>To recognise which posts are from groups you joined</td>
+          </tr>
+          <tr>
+            <td><strong>Daily counts</strong> — how many posts fell into each category, per day,
+            kept for 30 days</td>
+            <td>To show what your feed is made of</td>
+          </tr>
+          <tr>
+            <td><strong>A log of sources you hid</strong> — the name of each page, group or
+            person you told Facebook to stop showing you, and when</td>
+            <td>Facebook keeps no such list; this is the only record you have of it</td>
+          </tr>
+          <tr>
+            <td><strong>Your settings</strong></td>
+            <td>To remember your choices</td>
+          </tr>
+          <tr>
+            <td><strong>Diagnostics</strong> — up to 20 recent entries recording which detection
+            strategy matched. These contain no names, no identifiers and no post content
+            whatsoever, only true/false values and strategy names.</td>
+            <td>To make it possible to fix the extension when Facebook changes its website</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>The content of posts is never stored</h3>
+    <p>
+      Post text is read into memory in order to classify a post and to recognise the same post
+      appearing twice, and is then discarded. It is never written to storage, never retained
+      after the page is closed, and never transmitted anywhere.
+    </p>
+
+    <h2>What the extension never does</h2>
+    <ul>
+      <li>It makes <strong>no network requests</strong>. There is no server to send anything to.</li>
+      <li>It contains <strong>no analytics, tracking, advertising or telemetry</strong> of any kind.</li>
+      <li>It <strong>does not sell, share or transmit</strong> your data to anyone, for any purpose.</li>
+      <li>It does not use cookies.</li>
+      <li>It does not read pages on any website other than Facebook.</li>
+      <li>It does not read your Facebook password, messages, or account credentials.</li>
+      <li>It does not scroll, browse or navigate on your behalf to gather information.</li>
+    </ul>
+
+    <h2>Permissions, and why each is needed</h2>
+    <div class="wrap">
+      <table>
+        <thead><tr><th>Permission</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>storage</code></td>
+            <td>To save the items listed above on your own device. This permission grants access
+            only to the extension's own storage, not to anything else on your computer.</td>
+          </tr>
+          <tr>
+            <td><code>https://*.facebook.com/*</code></td>
+            <td>To read and modify the appearance of Facebook pages you open. The extension is
+            not active on any other website.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Changes the extension can make to your Facebook account</h2>
+    <div class="callout attention">
+      <p>
+        This is not data collection, but it is worth stating plainly. Two optional features, both
+        <strong>switched off unless you turn them on</strong>, use Facebook's own
+        “Hide all from…” setting on your behalf:
+      </p>
+      <ul>
+        <li>a <strong>“Never show from this”</strong> button on posts, which acts only when you click it;</li>
+        <li>an <strong>automatic sweep</strong>, which applies the same setting to unchosen
+        sources as they appear.</li>
+      </ul>
+      <p>
+        These change a preference on your Facebook account. The effect is permanent until you
+        reverse it on Facebook (Settings → News Feed → Reconnect), and it applies wherever you
+        use Facebook, including on your phone. Every use is recorded in the local log described
+        above so you can review what was done.
+      </p>
+    </div>
+
+    <h2>Your data, and deleting it</h2>
+    <p>
+      Because nothing is ever sent anywhere, there is no copy of your data for anyone to
+      disclose, correct or delete on your behalf. You hold the only copy, and you can remove it
+      at any time:
+    </p>
+    <ul>
+      <li><strong>Clear index</strong> and <strong>Clear stats</strong> in the extension's popup
+      remove the stored friends, groups and counts.</li>
+      <li><strong>Uninstalling the extension</strong> deletes everything it has stored, permanently.</li>
+    </ul>
+    <p>
+      Note that removing the extension does not undo any “Hide all from…” settings already
+      applied to your Facebook account; those are reversed on Facebook itself.
+    </p>
+
+    <h2>Third parties</h2>
+    <p>
+      The extension bundles no third-party code, libraries or services. It loads nothing from the
+      internet at runtime. No third party receives any information from it, because it sends none.
+    </p>
+    <p>
+      Your use of Facebook remains governed by Facebook's own terms and privacy policy. This
+      extension is not affiliated with, endorsed by, or connected to Meta Platforms, Inc.
+    </p>
+
+    <h2>Children</h2>
+    <p>
+      The extension is not directed at children and collects no information from anyone,
+      regardless of age.
+    </p>
+
+    <h2>Changes to this policy</h2>
+    <p>
+      If the extension's handling of data ever changes, this page will be updated and the date at
+      the top revised. Because the extension collects nothing, any change here would represent a
+      significant change in what it does.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy or about the extension:
+      <!-- Replace with the address you want published. -->
+      <a href="mailto:CONTACT@EXAMPLE.COM">CONTACT@EXAMPLE.COM</a>
+    </p>
+
+    <footer>
+      Feed Filter is open source. You can read every line it runs, and verify each claim on this
+      page against the code, in the project repository.
+    </footer>
+  </body>
+</html>

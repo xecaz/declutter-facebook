@@ -328,20 +328,137 @@ globalThis.FBF = globalThis.FBF || {};
   }
 
   /**
-   * "Sponsored" across the languages Facebook's UI ships in. Matched only
-   * against short standalone labels and accessible names, never against post
-   * prose, so a post that merely discusses advertising is not caught.
+   * Lowercased, with accents removed and punctuation flattened.
+   *
+   * Matching accented words literally means listing every spelling and getting
+   * every one of them right — "Följ", "Følg", "Sledovať", "Alătură-te". Folding
+   * the accents away first means one entry covers the word however it is
+   * written, and a missing accent in Facebook's markup cannot cause a miss.
+   *
+   * NFD splits an accented character into its base plus a combining mark; the
+   * range being stripped is those marks.
    */
-  const SPONSORED_WORD =
-    /sponsor|gesponsor|patrocin|sponsoris|commandit|publicidad|werbeanzeige|anzeige|reklam|sponsrad|sponsoreret|sponset|sponsorizzat/i;
+  /**
+   * Letters that NFD cannot help with.
+   *
+   * Stripping combining marks handles anything that is a base letter plus an
+   * accent — é, ä, å, ř. It does nothing for letters that are their own
+   * character rather than a decorated one: Danish ø, Polish ł, Turkish
+   * dotless ı, German ß. Those have to be mapped by hand, and forgetting them
+   * is exactly how "Følg" and "Dołącz" went unrecognised.
+   */
+  const SPECIAL_LETTERS = {
+    ø: 'o', æ: 'ae', œ: 'oe', ß: 'ss', ł: 'l', đ: 'd', ð: 'd',
+    þ: 'th', ı: 'i', ħ: 'h', ŧ: 't', ŋ: 'n', ĸ: 'k',
+  };
 
-  /** Accessible names for the post menu on an ad: "… sponsored content". */
-  const SPONSORED_ARIA =
-    /sponsored content|gesponsorde inhoud|gesponserte inhalte|contenu sponsoris|contenido patrocinado|contenuto sponsorizzat|sponsrat innehåll/i;
+  function fold(text) {
+    let out = normalize(text).toLowerCase();
+    for (const [from, to] of Object.entries(SPECIAL_LETTERS)) {
+      if (out.includes(from)) out = out.split(from).join(to);
+    }
+    return out
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[·•|.,!]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /**
+   * Button labels meaning "follow this page" and "join this group", across the
+   * languages Facebook's interface ships in.
+   *
+   * Held as folded strings and matched whole, not as a regex of substrings.
+   * Whole-label matching is what keeps a post that merely contains the word
+   * "follow" in its text from being treated as carrying a Follow button, and a
+   * set lookup stays fast however long these lists grow.
+   *
+   * Follow and Join are deliberately separate: only Join settles whether you
+   * are in a group, because a group you belong to can still offer to follow
+   * its posts.
+   */
+  const FOLLOW_LABELS = new Set([
+    // English, Dutch, German, French, Spanish, Portuguese, Italian
+    'follow', 'volgen', 'folgen', 'suivre', "s'abonner", 'sabonner',
+    'seguir', 'segui', 'seguir pagina',
+    // Nordic and Finnish
+    'folj', 'folg', 'seuraa', 'fylgjast med',
+    // Central and Eastern Europe
+    'obserwuj', 'sledovat', 'kovetes', 'kovetem', 'urmareste', 'urmariti',
+    'prati', 'zaprati', 'sledi', 'spremljaj',
+    // Baltic
+    'jalgi', 'sekot', 'sekti',
+    // Greek, Cyrillic, Turkish, Catalan, Irish, Maltese
+    'ακολουθηση', 'подписаться', 'стежити', 'последвай',
+    'takip et', 'segueix', 'lean', 'segwi',
+  ]);
+
+  const JOIN_LABELS = new Set([
+    // English, Dutch, German, French, Spanish, Portuguese, Italian
+    'join', 'join group', 'lid worden', 'word lid', 'beitreten',
+    'gruppe beitreten', 'rejoindre', 'rejoindre le groupe',
+    'unirte', 'unirse', 'unirme', 'unirte al grupo',
+    'participar', 'entrar no grupo', 'iscriviti', 'unisciti',
+    // Nordic and Finnish
+    'ga med', 'bli med', 'deltag', 'bliv medlem', 'liity', 'ganga i hop',
+    // Central and Eastern Europe
+    'dolacz', 'dolacz do grupy', 'pripojit se', 'pripojit sa',
+    'csatlakozas', 'alatura-te', 'alatura te',
+    'pridruzi se', 'pristupi',
+    // Baltic
+    'liitu', 'pievienoties', 'prisijungti',
+    // Greek, Cyrillic, Turkish, Catalan
+    'συμμετοχη', 'присоединиться', 'приєднатися', 'присъедини се',
+    'katil', 'uneix-te', 'uneix te',
+  ]);
+
+  /**
+   * "Sponsored", as a substring. Ads are matched on stems rather than whole
+   * labels because Facebook appends and inflects around the word, and because
+   * the label is only ever read from short standalone elements and accessible
+   * names — never from post prose — so a stem cannot catch an ordinary post
+   * that happens to discuss advertising.
+   */
+  const SPONSORED_WORD = new RegExp(
+    [
+      // 'gespons' rather than 'gesponsor': Dutch is "gesponsord" and German
+      // "gesponsert", and a stem taken from one does not match the other.
+      'sponsor', 'gespons', 'sponsoris', 'sponsorizzat', 'sponsrad',
+      'sponsoreret', 'sponset', 'sponzorirano', 'sponzorovan', 'sponsorowan',
+      'patrocin', 'publicidad', 'publicidade', 'commandit',
+      'werbeanzeige', 'werbung', 'anzeige', 'reklam', 'mainos', 'hirdetes',
+      'promovat', 'χορηγουμεν', 'реклама', 'спонсор',
+    ].join('|'),
+    'i',
+  );
+
+  /** Accessible names for the post menu on an ad: "... sponsored content". */
+  const SPONSORED_ARIA = new RegExp(
+    [
+      'sponsored content', 'gesponsorde inhoud', 'gesponserte inhalte',
+      'contenu sponsoris', 'contenido patrocinado', 'conteudo patrocinado',
+      'contenuto sponsorizzat', 'sponsrat innehall', 'sponsoreret indhold',
+      'sponsoroitu sisalto', 'tresc sponsorowana',
+    ].join('|'),
+    'i',
+  );
 
   const MARKER_PATTERNS = {
-    suggested: /suggested for you|people you may know|suggested group|suggested post|you might like|voorgesteld voor jou|vorgeschlagen/i,
-    attribution: /commented on this|replied to a comment|reacted to this|shared a post|follows this|is following|reageerde hierop/i,
+    suggested: new RegExp(
+      [
+        'suggested for you', 'suggested group', 'suggested post', 'you might like',
+        'people you may know',
+        'voorgesteld', 'vorgeschlagen', 'vorschlag',
+        'suggere', 'sugerido', 'sugerencia', 'consigliato', 'suggerit',
+        'foreslaet', 'forslag', 'ehdotettu', 'ehdotus',
+        'proponowane', 'javasolt', 'doporucene', 'sugerat', 'predlozeno',
+        'προτεινομεν', 'рекомендуем', 'предложено',
+      ].join('|'),
+      'i',
+    ),
+    attribution:
+      /commented on this|replied to a comment|reacted to this|shared a post|follows this|is following|reageerde hierop|hat kommentiert|a commente/i,
     reels: /\breels?\b|short videos/i,
   };
 
@@ -363,7 +480,7 @@ globalThis.FBF = globalThis.FBF || {};
       for (const node of el.childNodes) {
         if (node.nodeType === 3) own += node.nodeValue;
       }
-      own = normalize(own).trim();
+      own = fold(own);
       if (!own || own.length > 28) continue;
       if (visit(own, el) === false) return;
     }
@@ -384,7 +501,7 @@ globalThis.FBF = globalThis.FBF || {};
    */
   function detectSponsored(article) {
     for (const el of article.querySelectorAll('[aria-label]')) {
-      const label = normalize(el.getAttribute('aria-label'));
+      const label = fold(el.getAttribute('aria-label'));
       if (SPONSORED_ARIA.test(label)) return 'aria-label';
     }
 
@@ -405,7 +522,7 @@ globalThis.FBF = globalThis.FBF || {};
   }
 
   function detectMarkers(article) {
-    const text = headerText(article);
+    const text = fold(headerText(article));
 
     const sponsoredVia = detectSponsored(article);
     const markers = {
@@ -482,13 +599,13 @@ globalThis.FBF = globalThis.FBF || {};
       const parentArticle = el.parentElement && el.parentElement.closest(ARTICLE);
       if (parentArticle && parentArticle !== article && article.contains(parentArticle)) continue;
 
-      const label = normalize(el.getAttribute('aria-label') || el.textContent || '')
-        .replace(/[·•|]/g, '')
-        .trim();
-      if (!label || label.length > 14) continue;
+      // Long enough for the wordier languages — "rejoindre le groupe",
+      // "gruppe beitreten" — while still excluding anything sentence-sized.
+      const label = fold(el.getAttribute('aria-label') || el.textContent || '');
+      if (!label || label.length > 24) continue;
 
-      if (FOLLOW_WORD.test(label)) found.follow = true;
-      else if (JOIN_WORD.test(label)) found.join = true;
+      if (FOLLOW_LABELS.has(label)) found.follow = true;
+      else if (JOIN_LABELS.has(label)) found.join = true;
 
       if (found.follow && found.join) break;
     }

@@ -1,0 +1,141 @@
+Your feed is mostly things you never asked for. This gives you back the part
+you chose.
+
+
+WHAT IT DOES
+
+Feed Filter looks at every post in your Facebook home feed and works out one
+thing: did you choose this?
+
+A post from a friend you added, or a group you joined, is something you asked
+for. A page you have never followed, a "suggested for you" post, an ad - is
+not. You decide what happens to the rest: leave it alone, grey it out, or hide
+it completely.
+
+It also counts, so you can see what your feed is actually made of. On the feed
+this was built against, roughly one post in six came from a friend or a joined
+group. The rest was chosen for you.
+
+
+WHY IT KEEPS WORKING
+
+Most feed cleaners run from a blocklist: hide anything labelled "Sponsored",
+hide "Suggested for you", hide Reels, hide "People you may know". That is a
+race against a team shipping changes daily, and it loses ground every month.
+
+Feed Filter asks the opposite question. Instead of "is this one of the things
+Facebook injects?", it asks "is this someone I picked?" - checked against a
+list you build yourself from your own friends and groups pages.
+
+The difference is that new kinds of injected content need no new rule.
+
+It also does not need your Facebook set to English. The Follow and Join buttons
+are recognised in around twenty European languages, and the sponsored and
+suggested labels in a dozen, with accents folded away so spelling variations do
+not matter.
+
+
+IT ERRS TOWARDS LEAVING THINGS ALONE
+
+Before anything is dimmed or hidden, something has to actively show you are not
+connected to the source: a Follow button, a Join button, a "Suggested" label,
+or an ad marker.
+
+Not being on your list is not enough on its own. A page you already follow
+never shows a Follow button - precisely because you follow it - so it stays.
+The cost of that choice is that some unwanted posts survive; the benefit is
+that a post you did want is not silently removed before you ever see it.
+
+Friends and groups you joined are never touched, under any setting.
+
+
+SETTING IT UP
+
+Two pages, scrolled to the bottom once each:
+
+  * facebook.com/friends/list  ("All friends")
+  * facebook.com/groups/joins  ("Your groups")
+
+The extension reads the rows as they appear. It does not scroll for you, open
+pages in the background, or collect anything you have not opened yourself. The
+popup shows a running count so you can watch it work.
+
+Worth repeating occasionally - a group you joined last month is not on a list
+captured before you joined it.
+
+
+CHECKING IT IS RIGHT
+
+Switch on the outline overlay and every post gets a colour: green for friends,
+blue for groups you joined, orange for pages and strangers, red for ads, grey
+for anything it could not read.
+
+Look at a few posts you recognise. Counts can be confidently wrong, and this is
+the only honest way to know it is working on your feed.
+
+The popup also reports its own health. If the share of unreadable posts climbs,
+it says so rather than quietly producing a wrong number.
+
+
+OPTING OUT PERMANENTLY (OPTIONAL, OFF BY DEFAULT)
+
+Hiding a post only affects your browser. If you would rather a source stopped
+appearing at all, two optional features use Facebook's own "Hide all from..."
+setting:
+
+  * a button on unchosen posts, which acts only when you click it
+  * an automatic sweep, which applies it to unchosen sources as they appear,
+    without asking each time
+
+Please read this part before switching either on:
+
+  * It changes a setting on your Facebook account, not just in your browser.
+  * It therefore applies everywhere you use Facebook, including your phone.
+  * It is permanent until you reverse it on Facebook itself, under
+    Settings -> News Feed -> Reconnect.
+  * Facebook keeps no list of what you have hidden. The extension keeps a local
+    one, so you can see what was done.
+
+Both are off unless you turn them on. Ads are deliberately left out of the
+automatic sweep - there is an endless supply of advertisers, so hiding them one
+at a time achieves nothing.
+
+
+PRIVACY
+
+Nothing is collected. There is no server, and the extension makes no network
+requests of any kind - not to me, not to anyone.
+
+  * No analytics, no tracking, no telemetry, no cookies.
+  * Your friends and groups list, your counts and your settings are stored in
+    your browser's local storage on your own device. They are never synced and
+    never transmitted.
+  * The text of posts is read to classify them and then discarded. It is never
+    stored.
+  * It is only active on facebook.com, and never reads your credentials or your
+    messages.
+  * It contains no third-party code and loads nothing at runtime.
+
+Uninstalling deletes everything it has stored.
+
+
+HONEST LIMITATIONS
+
+  * Facebook reshapes its markup constantly, and when it does this will break.
+    The popup tells you when that happens instead of silently reporting
+    nonsense, and fixing it means editing one file.
+  * It works on the desktop web only. A browser extension cannot reach the
+    phone app.
+  * It counts the home feed, not profiles or group pages - those are content
+    you navigated to on purpose.
+  * Building the index takes a couple of minutes of scrolling. Without it,
+    nothing works.
+
+
+OPEN SOURCE
+
+Every line is readable, there is no build step, no bundler and no dependencies
+of any kind. Each claim on this page can be checked against the source, and the
+test suite runs in your own browser.
+
+Not affiliated with, endorsed by, or connected to Meta Platforms, Inc.

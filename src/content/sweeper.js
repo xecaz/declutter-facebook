@@ -43,7 +43,7 @@ globalThis.FBF = globalThis.FBF || {};
   const MAX_CONSECUTIVE_FAILURES = 5;
 
   /** A ceiling on a single day's actions. Raise it if it gets in the way. */
-  const DAILY_CAP = 150;
+  const DAILY_CAP = 300;
 
   /**
    * What the sweep acts on — recurring sources, and deliberately not ads.
